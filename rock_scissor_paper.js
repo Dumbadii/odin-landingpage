@@ -1,40 +1,67 @@
 let CHOICE = ["rock", "scissor", "paper"];
 let computerScore = 0;
 let playerScore = 0;
-
-let keepPlaying = true;
+let evenRounds = 0;
 
 let computerChoice = "";
-let playerChoice = "";
-let winner = "";
 
-while (keepPlaying) {
-  playerChoice = getPlayerChoice();
+const gameInfo = document.querySelector(".gameInfo");
+const roundInfo = document.querySelector(".roundInfo");
+const divChoiceContainer = document.querySelector(".choiceContainer");
+divChoiceContainer.addEventListener("click", (e) => {
+  if (e.target?.dataset?.rps) playRound(e.target.dataset.rps);
+});
+
+showGameInfo();
+
+function playRound(playerChoice) {
   computerChoice = getComputerChoice();
   winner = decideWinner(playerChoice, computerChoice);
-  winner == "player"
-    ? playerWin()
-    : winner == "computer"
-      ? computerWin()
-      : even();
-
-  keepPlaying = choosePlayOrQuit();
+  addScore(winner);
+  showRoundInfo(playerChoice, computerChoice, winner);
+  showGameInfo();
+  if (playerScore + computerScore + evenRounds >= 5) {
+    showGameResult();
+    clearScores();
+  }
 }
 
-showFinalScore();
-
+function showRoundInfo(playerChoice, computerChoice, winner) {
+  const choiceInfo = `You select ${playerChoice}, computer select ${computerChoice}: `;
+  roundInfo.textContent =
+    choiceInfo +
+    (winner === "player"
+      ? "You win!"
+      : winner === "computer"
+        ? "Computer win!"
+        : "Even round!");
+}
+function addScore(winner) {
+  winner === "player"
+    ? playerScore++
+    : winner === "computer"
+      ? computerScore++
+      : evenRounds++;
+}
+function clearScores() {
+  playerScore = 0;
+  computerScore = 0;
+  evenRounds = 0;
+}
+function showGameResult() {
+  let gameResult = "";
+  gameResult =
+    playerScore > computerScore
+      ? "You win"
+      : playerScore < computerScore
+        ? "Computer Win"
+        : "even";
+  gameResult += " in 5 rounds";
+  gameInfo.textContent += gameResult;
+}
 function getComputerChoice() {
   let index = Math.floor(Math.random() * CHOICE.length);
   return CHOICE[index];
-}
-
-function getPlayerChoice() {
-  let index = parseInt(
-    prompt("Your choice? 0 for rock, 1 for scissor, 2 for paper: "),
-  );
-  if (index >= 0 && index < CHOICE.length) return CHOICE[index];
-  console.log("Wrong input, choose again.");
-  return getPlayerChoice();
 }
 
 function decideWinner(playerChoice, computerChoice) {
@@ -44,24 +71,6 @@ function decideWinner(playerChoice, computerChoice) {
   return "computer";
 }
 
-function choosePlayOrQuit() {
-  let answer = prompt("Play again? y/n: ");
-  if (answer.toUpperCase() === "Y") return true;
-  return false;
-}
-
-function showFinalScore() {
-  console.log(
-    `Player Score: ${playerScore} | Computer Score: ${computerScore}`,
-  );
-}
-
-function computerWin() {
-  console.log(`Computer win!! score:${++computerScore}`);
-}
-function playerWin() {
-  console.log(`You win!! score:${++playerScore}`);
-}
-function even() {
-  console.log("It's even.'");
+function showGameInfo() {
+  gameInfo.textContent = `Player Score: ${playerScore} | Computer Score: ${computerScore}`;
 }
